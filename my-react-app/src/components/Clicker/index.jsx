@@ -76,8 +76,8 @@ const Clicker = (elemRef) => {
     setStep(parseInt(e.target.value) || 0);
   };
 
-  const handleSpeedChange = (event) => {
-    setAutoAddSpeed(parseInt(event.target.value) || 0);
+  const handleSpeedChange = (e) => {
+    setAutoAddSpeed(parseInt(e.target.value) || 0);
   };
 
   return (
