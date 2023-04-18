@@ -13,27 +13,40 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 const Clicker = (elemRef) => {
+  const [count, setCount] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [isStarted, setIstarted] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const [intervalId, setIntervalId] = useState(null);
   const [step, setStep] = useState(1);
+  const [clicksPerIteration, setClicksPerIteration] = useState(1);
   const [isAdding, setIsAdding] = useState(true);
-  const [autoAddSpeed, setAutoAddSpeed] = useState(1);
-  const [autoAddInterval, setAutoAddInterval] = useState(null);
 
   useEffect(() => {
     autoClicks();
     return stopAutoClicks;
   }, []);
 
+  const changeStep = (e) => setStep(+e.target.value);
+
+  function changeSpeed(e) {
+    setSpeed(+e.target.value);
+  }
+
   const addClicks = () => {
     setClicks((clicks) => clicks + step);
+  };
+
+  const deleteClicks = () => {
+    if (clicks > 0 && clicks >= step) {
+      setClicks((clicks) => clicks - step);
+    }
   };
 
   const autoClicks = () => {
     if (!isStarted) {
       setIstarted(true);
-      const intervalId = setInterval(addClicks, autoAddSpeed * 1000);
+      const intervalId = setInterval(addClicks, speed * 1000);
       setIntervalId(intervalId);
     }
   };
@@ -50,56 +63,39 @@ const Clicker = (elemRef) => {
     setClicks(0);
   };
 
+  const handleInputChange = (event) => {
+    setClicksPerIteration(parseInt(event.target.value) || 0);
+  };
+
   const handleClick = () => {
     if (isAdding) {
-      setClicks((clicks) => clicks + step);
+      setCount(count + clicksPerIteration);
     } else {
-      setClicks((clicks) => clicks - step);
+      setCount(count - clicksPerIteration);
     }
     setIsAdding(!isAdding);
   };
 
-  const handleAutoAddClicks = () => {
-    if (!autoAddInterval) {
-      setAutoAddInterval(
-        setInterval(() => {
-          handleClick();
-        }, autoAddSpeed),
-      );
-    } else {
-      clearInterval(autoAddInterval);
-      setAutoAddInterval(null);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    setStep(parseInt(e.target.value) || 0);
-  };
-
-  const handleSpeedChange = (event) => {
-    setAutoAddSpeed(parseInt(event.target.value) || 0);
-  };
-
   return (
     <div>
+      <h1>Clicks : {clicks}</h1>
       <p>How many clicks do you want to add in one step?</p>
       <input
-        type='number'
-        value={step}
+        type="number"
+        value={clicksPerIteration}
         onChange={handleInputChange}
       />
+      <p>Count: {count}</p>
       <button onClick={handleClick}>
-        {isAdding
-          ? `Add ${clicks}`
-          : `Subtract ${clicks}`}
+        {isAdding ? `Add ${clicksPerIteration}` : `Subtract ${clicksPerIteration}`}
       </button>
-      <button onClick={stopAutoClicks}>Stop</button>
+      <button onClick={addClicks}>Add {step} of clicks </button>
+      <button onClick={deleteClicks}>Remove {step} of clicks</button>
+      <button onClick={autoClicks}>
+        Auto clicks by {step} clicks with {speed}
+      </button>
+      <button onClick={stopAutoClicks}>Stop autoClick</button>
       <button onClick={reset}>Reset</button>
-      <input type='number' value={autoAddSpeed} onChange={handleSpeedChange} />
-      <button onClick={handleAutoAddClicks}>
-        {autoAddInterval ? 'Stop' : 'Start'} auto add clicks
-      </button>
-      <h1>Clicks : {clicks}</h1>
     </div>
   );
 };
